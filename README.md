@@ -43,7 +43,7 @@ cd financial-management-api
 #### Inicie os containers
 docker-compose up -d
 
-Sem Docker
+### Sem Docker
 
 #### Instale as dependências
 npm install
