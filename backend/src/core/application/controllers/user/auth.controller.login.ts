@@ -23,7 +23,7 @@ export class AuthControllerLogin {
     
     const token = this.jwtService.sign(payload);
     
-    // Retornar APENAS user e token (sem wrapper adicional)
+   
     return {
       user,
       token,

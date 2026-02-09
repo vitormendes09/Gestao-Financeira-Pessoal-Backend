@@ -20,7 +20,7 @@ export class AuthControllerSignup {
         email: user.email 
       });
       
-      // Retornar APENAS user e token (sem wrapper adicional)
+      
       return {
         user,
         token,

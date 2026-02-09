@@ -1,3 +1,4 @@
+// components/dashboard/transaction-form.tsx
 'use client'
 
 import { useState } from 'react'
@@ -29,6 +30,8 @@ export default function TransactionForm({ onSuccess }: TransactionFormProps) {
   } = useForm<FormData>({
     resolver: zodResolver(transactionSchema),
     defaultValues: {
+      amount: 0,
+      description: '',
       date: new Date(),
       type: 'expense',
     },
@@ -37,13 +40,31 @@ export default function TransactionForm({ onSuccess }: TransactionFormProps) {
   const selectedType = watch('type')
 
   const onSubmit = async (data: FormData) => {
+    console.log('📋 Dados do formulário:', data)
+    
     try {
-      await createMutation.mutateAsync(data)
+      // Preparar dados no formato correto para a API
+      // O CreateTransactionDto espera Date, então mantemos como Date
+      const transactionData = {
+        amount: Number(data.amount),
+        description: data.description,
+        date: data.date, // Já é um Date do react-hook-form
+        type: data.type,
+        ...(data.recurrenceDay && { recurrenceDay: Number(data.recurrenceDay) })
+      }
+      
+      console.log('📤 Enviando para API:', transactionData)
+      console.log('📤 Tipo da data:', typeof transactionData.date)
+      console.log('📤 Data como ISO:', transactionData.date.toISOString())
+      
+      await createMutation.mutateAsync(transactionData)
       toast.success('Transação cadastrada com sucesso!')
       reset()
       onSuccess?.()
-    } catch (error) {
-      toast.error('Erro ao cadastrar transação')
+    } catch (error: any) {
+      console.error('❌ Erro ao cadastrar transação:', error)
+      console.error('❌ Detalhes do erro:', error.response?.data || error.message)
+      toast.error(error.message || 'Erro ao cadastrar transação')
     }
   }
 

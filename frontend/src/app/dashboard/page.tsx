@@ -1,3 +1,4 @@
+// app/dashboard/page.tsx - CORRIGIDO
 'use client'
 
 import { useState } from 'react'
@@ -14,10 +15,20 @@ export default function DashboardPage() {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1)
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
 
+  // Função para atualizar o filtro (será passada para o MonthlySummary)
+  const handleMonthChange = (month: number, year: number) => {
+    setSelectedMonth(month)
+    setSelectedYear(year)
+  }
+
   return (
     <div className="space-y-6">
-      {/* Resumo Mensal */}
-      <MonthlySummary />
+      {/* Resumo Mensal - passar callback para atualizar filtro */}
+      <MonthlySummary 
+        onMonthChange={handleMonthChange}
+        selectedMonth={selectedMonth}
+        selectedYear={selectedYear}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Formulário de Transação */}
@@ -41,9 +52,12 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        {/* Lista de Transações */}
+        {/* Lista de Transações - usar initialMonth e initialYear */}
         <div className="lg:col-span-2">
-          <TransactionList month={selectedMonth} year={selectedYear} />
+          <TransactionList 
+            initialMonth={selectedMonth} 
+            initialYear={selectedYear} 
+          />
         </div>
       </div>
 

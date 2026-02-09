@@ -1,8 +1,7 @@
+// components/dashboard/monthly-summary.tsx - ATUALIZADO
 'use client'
 
 import { useState, useEffect } from 'react'
-import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
 import { useBalance } from '../../../lib/hooks/use-transactions'
 import { getMonthName } from '../../../lib/utils/date'
 import BalanceCard from './balance-card'
@@ -12,9 +11,24 @@ import { Button } from '../../../components/ui/button'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { ErrorMessage } from '@/components/shared/error-menssage'
 
-export default function MonthlySummary() {
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1)
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
+interface MonthlySummaryProps {
+  onMonthChange?: (month: number, year: number) => void
+  selectedMonth?: number
+  selectedYear?: number
+}
+
+export default function MonthlySummary({ 
+  onMonthChange,
+  selectedMonth: externalMonth,
+  selectedYear: externalYear
+}: MonthlySummaryProps) {
+  // Usar estado interno ou externo
+  const [internalMonth, setInternalMonth] = useState(new Date().getMonth() + 1)
+  const [internalYear, setInternalYear] = useState(new Date().getFullYear())
+  
+  // Decidir qual usar
+  const selectedMonth = externalMonth !== undefined ? externalMonth : internalMonth
+  const selectedYear = externalYear !== undefined ? externalYear : internalYear
 
   const { data: balance, isLoading, error, refetch } = useBalance(
     selectedMonth,
@@ -34,8 +48,30 @@ export default function MonthlySummary() {
       newDate.setMonth(newDate.getMonth() + 1)
     }
     
-    setSelectedMonth(newDate.getMonth() + 1)
-    setSelectedYear(newDate.getFullYear())
+    const newMonth = newDate.getMonth() + 1
+    const newYear = newDate.getFullYear()
+    
+    // Atualizar estado
+    if (externalMonth === undefined) {
+      setInternalMonth(newMonth)
+      setInternalYear(newYear)
+    }
+    
+    // Chamar callback se existir
+    onMonthChange?.(newMonth, newYear)
+  }
+
+  const handleToday = () => {
+    const now = new Date()
+    const newMonth = now.getMonth() + 1
+    const newYear = now.getFullYear()
+    
+    if (externalMonth === undefined) {
+      setInternalMonth(newMonth)
+      setInternalYear(newYear)
+    }
+    
+    onMonthChange?.(newMonth, newYear)
   }
 
   if (isLoading) return <LoadingSpinner />
@@ -59,11 +95,7 @@ export default function MonthlySummary() {
               <Button
                 variant="secondary"
                 size="sm"
-                onClick={() => {
-                  const now = new Date()
-                  setSelectedMonth(now.getMonth() + 1)
-                  setSelectedYear(now.getFullYear())
-                }}
+                onClick={handleToday}
               >
                 Hoje
               </Button>

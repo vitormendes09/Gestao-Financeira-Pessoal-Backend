@@ -10,6 +10,8 @@ Uma API RESTful para gerenciamento financeiro pessoal desenvolvida com NestJS, s
 
     Mongoose - ODM para MongoDB
 
+    NEXT - FRONTEND
+
     JWT - Autenticação por tokens
 
     Docker - Containerização
@@ -28,38 +30,19 @@ Uma API RESTful para gerenciamento financeiro pessoal desenvolvida com NestJS, s
 
     Autenticação JWT: Sistema stateless com tokens de acesso para segurança.
 
-    Containerização: Docker Compose para ambiente de desenvolvimento consistente.
+    Containerização: Docker Compose para ambiente de desenvolvimento consistente.   
 
-## Execução Rápida
 
-### Usando Docker     
+## Pré-requisitos
+- Docker instalado
+- Node.js 18+ instalado
+- npm ou yarn
 
 #### Clone o repositório
-git clone https://github.com/vitormendes09/Gestao-Financeira-Pessoal-Backend.git
-
-#### Entre no diretório
-cd financial-management-api
-
-#### Inicie os containers
-docker-compose up -d
-
-### Sem Docker
-
-#### Instale as dependências
-npm install
-
-#### Configure as variáveis de ambiente
-cp .env.example .env
-#### Edite o .env com suas configurações
-
-#### Inicie o MongoDB localmente
-#### (ou use um serviço cloud como MongoDB Atlas)
-
-#### Execute a aplicação
-npm run start:dev
+git clone https://github.com/vitormendes09/Gestao-Financeira-Pessoal.git
 
 
-Variáveis de Ambiente
+## Variáveis de Ambiente
 
 Crie um arquivo .env na raiz do projeto:
 
@@ -68,8 +51,27 @@ JWT_SECRET=sua_chave_secreta_jwt_aqui_32_caracteres
 NODE_ENV=development
 PORT=3000
 
+## Execusão (Linux/Mac)
 
-Endpoints da API
+### Dar permissão de execução ao script
+
+chmod +x start-app.sh
+
+### Iniciar toda a aplicação
+./start-app.sh
+
+### Para parar a aplicação
+./stop-app.sh
+
+## Execusão (Windows)
+
+### Iniciar toda a aplicação
+start-app.bat
+
+### Para parar a aplicação
+stop-app.bat
+
+## Endpoints da API
 
 Autenticação
 
@@ -98,3 +100,6 @@ Tipos de Transação
     expense - Despesa
 
     fixed-expense - Despesa fixa (com recorrência mensal)
+
+
+

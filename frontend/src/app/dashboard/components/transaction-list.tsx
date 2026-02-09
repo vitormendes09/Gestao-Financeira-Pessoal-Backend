@@ -1,3 +1,4 @@
+// components/dashboard/transaction-list.tsx - ATUALIZADO
 'use client'
 
 import { useState } from 'react'
@@ -15,19 +16,29 @@ import {
   Trash2, 
   TrendingUp, 
   TrendingDown, 
-  Calendar 
+  Calendar,
+  Filter,
+  X
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { ErrorMessage } from '@/components/shared/error-menssage'
+import TransactionFilter from './transaction-filter'
 
 interface TransactionListProps {
-  month?: number
-  year?: number
+  initialMonth?: number
+  initialYear?: number
 }
 
-export default function TransactionList({ month, year }: TransactionListProps) {
+export default function TransactionList({ 
+  initialMonth = new Date().getMonth() + 1,
+  initialYear = new Date().getFullYear()
+}: TransactionListProps) {
+  const [showFilter, setShowFilter] = useState(false)
+  const [selectedMonth, setSelectedMonth] = useState(initialMonth)
+  const [selectedYear, setSelectedYear] = useState(initialYear)
   const [deletingId, setDeletingId] = useState<string | null>(null)
-  const { data: transactions, isLoading, error } = useTransactions(month, year)
+  
+  const { data: transactions, isLoading, error, refetch } = useTransactions(selectedMonth, selectedYear)
   const deleteMutation = useDeleteTransaction()
 
   const handleDelete = async (id: string) => {
@@ -44,6 +55,12 @@ export default function TransactionList({ month, year }: TransactionListProps) {
     } finally {
       setDeletingId(null)
     }
+  }
+
+  const handleFilterChange = (month: number, year: number) => {
+    setSelectedMonth(month)
+    setSelectedYear(year)
+    setShowFilter(false)
   }
 
   const getTypeIcon = (type: string) => {
@@ -74,78 +91,116 @@ export default function TransactionList({ month, year }: TransactionListProps) {
 
   if (isLoading) return <LoadingSpinner />
   if (error) return <ErrorMessage message="Erro ao carregar transações" />
-  if (!transactions?.length) {
-    return (
-      <Card>
-        <CardContent>
-          <p className="text-center text-gray-500 py-8">
-            Nenhuma transação encontrada
-          </p>
-        </CardContent>
-      </Card>
-    )
-  } 
 
   return (
-    <Card>
-      <CardHeader title="Transações" subtitle={`Total: ${transactions.length}`} />
-      <CardContent>
-        <div className="space-y-4">
-          {transactions.map((transaction) => (
-            <div
-              key={transaction._id}
-              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+    <div className="space-y-6">
+      <Card>
+        <CardHeader
+          title="Transações"
+          subtitle={`${selectedMonth}/${selectedYear} - Total: ${transactions?.length || 0}`}
+          action={
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setShowFilter(!showFilter)}
+              className="flex items-center space-x-2"
             >
-              <div className="flex items-center space-x-4">
-                {getTypeIcon(transaction.type)}
-                <div>
-                  <p className="font-medium text-gray-900">
-                    {transaction.description}
-                  </p>
-                  <div className="flex items-center space-x-2 text-sm text-gray-500">
-                    <span className="px-2 py-1 bg-gray-200 rounded">
-                      {getTypeLabel(transaction.type)}
-                    </span>
-                    <span>•</span>
-                    <span>
-                      {format(new Date(transaction.date), 'dd/MM/yyyy', {
-                        locale: ptBR,
-                      })}
-                    </span>
-                    {transaction.recurrenceDay && (
-                      <>
+              {showFilter ? (
+                <>
+                  <X className="h-4 w-4" />
+                  <span>Fechar Filtro</span>
+                </>
+              ) : (
+                <>
+                  <Filter className="h-4 w-4" />
+                  <span>Filtrar</span>
+                </>
+              )}
+            </Button>
+          }
+        />
+        
+        {showFilter && (
+          <CardContent>
+            <TransactionFilter
+              onFilterChange={handleFilterChange}
+              initialMonth={selectedMonth}
+              initialYear={selectedYear}
+            />
+          </CardContent>
+        )}
+      </Card>
+
+      {!transactions?.length ? (
+        <Card>
+          <CardContent>
+            <p className="text-center text-gray-500 py-8">
+              Nenhuma transação encontrada para {selectedMonth}/{selectedYear}
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardContent>
+            <div className="space-y-4">
+              {transactions.map((transaction) => (
+                <div
+                  key={transaction._id}
+                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <div className="flex items-center space-x-4">
+                    {getTypeIcon(transaction.type)}
+                    <div>
+                      <p className="font-medium text-gray-900">
+                        {transaction.description}
+                      </p>
+                      <div className="flex items-center space-x-2 text-sm text-gray-500">
+                        <span className="px-2 py-1 bg-gray-200 rounded">
+                          {getTypeLabel(transaction.type)}
+                        </span>
                         <span>•</span>
-                        <span>Dia {transaction.recurrenceDay}</span>
-                      </>
-                    )}
+                        <span>
+                          {format(new Date(transaction.date), 'dd/MM/yyyy', {
+                            locale: ptBR,
+                          })}
+                        </span>
+                        {transaction.recurrenceDay && (
+                          <>
+                            <span>•</span>
+                            <span>Dia {transaction.recurrenceDay}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-4">
+                    <span
+                      className={`text-lg font-semibold ${
+                        transaction.type === 'income'
+                          ? 'text-success-600'
+                          : 'text-danger-600'
+                      }`}
+                    >
+                      {transaction.type === 'income' ? '+' : '-'}
+                      {formatCurrency(transaction.amount)}
+                    </span>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={() => handleDelete(transaction._id)}
+                      disabled={deletingId === transaction._id}
+                      title="Excluir transação"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
-              </div>
-              
-              <div className="flex items-center space-x-4">
-                <span
-                  className={`text-lg font-semibold ${
-                    transaction.type === 'income'
-                      ? 'text-success-600'
-                      : 'text-danger-600'
-                  }`}
-                >
-                  {transaction.type === 'income' ? '+' : '-'}
-                  {formatCurrency(transaction.amount)}
-                </span>
-                <Button
-                  variant="danger"
-                  size="sm"
-                  onClick={() => handleDelete(transaction._id)}
-                  disabled={deletingId === transaction._id}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+          </CardContent>
+        </Card>
+      )}
+    </div>
   )
 }

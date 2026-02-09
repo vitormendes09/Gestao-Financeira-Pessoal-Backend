@@ -6,7 +6,7 @@ export const useTransactions = (month?: number, year?: number) => {
   return useQuery({
     queryKey: ['transactions', month, year],
     queryFn: () => transactionApi.list({ month, year }),
-    enabled: !!(month && year), 
+    enabled: !!(month && year),
   })
 }
 
@@ -14,7 +14,7 @@ export const useBalance = (month: number, year: number) => {
   return useQuery({
     queryKey: ['balance', month, year],
     queryFn: () => transactionApi.getBalance(month, year),
-    enabled: !!(month && year), 
+    enabled: !!(month && year),
   })
 }
 
@@ -24,9 +24,13 @@ export const useCreateTransaction = () => {
   return useMutation({
     mutationFn: transactionApi.create,
     onSuccess: () => {
+      console.log('🔄 Invalidando queries de transações...')
       queryClient.invalidateQueries({ queryKey: ['transactions'] })
       queryClient.invalidateQueries({ queryKey: ['balance'] })
     },
+    onError: (error) => {
+      console.error('❌ Erro na mutation de criação:', error)
+    }
   })
 }
 

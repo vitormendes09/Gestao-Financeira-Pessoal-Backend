@@ -13,7 +13,7 @@ export interface Transaction {
 export interface CreateTransactionDto {
   amount: number
   description: string
-  date: Date
+  date: Date | string 
   type: TransactionType
   recurrenceDay?: number
 }

@@ -1,5 +1,3 @@
-
-
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
@@ -26,12 +24,12 @@ async function bootstrap() {
     },
   }));
   
-  // IMPORTANTE: Não use app.setGlobalPrefix se não estiver configurado nos controllers
+ 
   
   // Iniciar servidor
   const port = process.env.PORT || 3000;
   await app.listen(port);
-  console.log(`🚀 Backend rodando em: http://localhost:${port}`);
+  console.log(` Backend rodando em: http://localhost:${port}`);
 }
 
 bootstrap();

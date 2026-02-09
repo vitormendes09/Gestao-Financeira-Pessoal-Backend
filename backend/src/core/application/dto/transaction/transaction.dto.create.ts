@@ -12,7 +12,7 @@ export class CreateTransactionDto {
   description: string;
 
   @IsDate()
-  @Type(() => Date)
+  @Type(() => Date) 
   @IsNotEmpty()
   date: Date;
 
@@ -25,5 +25,4 @@ export class CreateTransactionDto {
   @Min(1)
   @Max(31)
   recurrenceDay?: number;
-
 }
