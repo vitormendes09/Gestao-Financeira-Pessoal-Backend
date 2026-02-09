@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserModel, UserSchema } from './schema/user.schema';
-import { TransactionModel, TransactionSchema } from './schema/transaction.schema'; // Importar
+import { TransactionModel, TransactionSchema } from './schema/transaction.schema';
 
 @Module({
   imports: [
@@ -15,9 +15,9 @@ import { TransactionModel, TransactionSchema } from './schema/transaction.schema
     }),
     MongooseModule.forFeature([
       { name: UserModel.name, schema: UserSchema },
-      { name: TransactionModel.name, schema: TransactionSchema }, // Adicionar
+      { name: TransactionModel.name, schema: TransactionSchema },
     ]),
   ],
   exports: [MongooseModule],
 })
-export class DatabaseModule {} 
+export class DatabaseModule {}

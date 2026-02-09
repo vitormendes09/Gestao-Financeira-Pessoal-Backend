@@ -18,7 +18,7 @@ import { UserServiceLogin } from 'src/core/application/services/user/user.servic
   providers: [
     // Repositórios
     UserRepositoryCreate,
-    UserRepositoryFindByEmail,
+    UserRepositoryFindByEmail, 
     UserRepositoryFindById,
     UserRepositoryUpdate,
     UserRepositoryDelete,
@@ -28,9 +28,9 @@ import { UserServiceLogin } from 'src/core/application/services/user/user.servic
     UserServiceLogin,
   ],
   exports: [
-    // Exporte os repositórios
+    // Exporte os repositórios necessários
     UserRepositoryCreate,
-    UserRepositoryFindByEmail,
+    UserRepositoryFindByEmail, 
     UserRepositoryFindById,
     UserRepositoryUpdate,
     UserRepositoryDelete,

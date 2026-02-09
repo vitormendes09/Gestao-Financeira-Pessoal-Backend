@@ -7,6 +7,9 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 COPY tsconfig*.json ./
 
+# Copiar .env se existir (usando shell trick)
+COPY .env* ./
+
 # Instalar dependências incluindo devDependencies
 RUN npm ci --include=dev
 
@@ -39,6 +42,9 @@ RUN npm ci --only=production
 
 # Copiar arquivos buildados do stage de desenvolvimento
 COPY --from=development /usr/src/app/dist ./dist
+
+# Criar .env de produção se necessário
+RUN if [ -f .env.production ]; then cp .env.production .env; fi
 
 # Expor porta
 EXPOSE 3000

@@ -85,7 +85,7 @@ export class TransactionController {
   }
 
   @Get(':id')
-  async findById(@Param('id', ParseUUIDPipe) id: string, @Request() req) {
+  async findById(@Param('id') id: string, @Request() req) {
     const userId = req.user.userId;
     
     const transaction = await this.transactionServiceFindById.findById(
